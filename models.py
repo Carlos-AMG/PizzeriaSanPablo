@@ -1,43 +1,68 @@
-from sqlalchemy import Date, Column, Integer, String, ForeignKey, Float, func
+from sqlalchemy import Date, Column, Integer, String, ForeignKey, Float, func, Time
 from sqlalchemy.orm import relationship
 from database import Base
 
-class Empleado(Base):
-    __tablename__ = "Empleado"
-    RFC = Column(Integer, primary_key=True, nullabable=False)
-    personaID = Column(Integer, ForeignKey("Persona.id", ondelete="CASCADE"), nullable=False) #pendiente
-    cargo = Column(String, nullable=False)
-    salario = Column(Float, nullable=False)
-    fechaInicio = Column(Date, nullable=False, default=func.current_date())
-
 class Persona(Base):
-    __tablename__ = "Persona"
-    ID = Column(Integer, ForeignKey=True, nullable=False)
-    nombre = Column(String, nullable=False)
-    apellidoP = Column(String, nullable=False)
-    apellidoM = Column(String, nullable=False)
+    __tablename__ = "PERSONA"
+    ID = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    Nombre1 = Column(String)
+    Nombre2 = Column(String)
+    ApellidoP = Column(String)
+    ApellidoM = Column(String)
+
+class Empleado(Base):
+    __tablename__ = "EMPLEADO"
+    RFC = Column(String, primary_key=True, nullable=False, unique=True)
+    PersonaID = Column(Integer, ForeignKey("PERSONA.ID", ondelete="CASCADE"), nullable=False) #pendiente
+    Cargo = Column(String, nullable=False)
+    Salario = Column(Float, nullable=False)
+    FechaInicio = Column(Date, nullable=False, default=func.current_date())
+
+class Direccion(Base):
+    __tablename__ = "DIRECCION"
+    DireccionID = Column(Integer, primary_key=True, autoincrement=True)
+    Calle = Column(String)
+    CodigoPostal = Column(String)
+    InfoAdicional = Column(String)
 
 class Cliente(Base):
-    __tablename__ = "Cliente"
-    numCliente = Column(Integer, primary_key=True, nullable=False)
-    telefono = Column(String)
-    personaID = Column(Integer, nullable=False, )
+    __tablename__ = "CLIENTE"
+    NumCliente = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    Telefono = Column(String)
+    PersonaID = Column(Integer, ForeignKey("PERSONA.ID", ondelete="CASCADE"), nullable=False)
+    DireccionID = Column(Integer, ForeignKey("DIRECCION.DireccionID", ondelete="CASCADE"))
 
 class Pedido(Base):
-    __tablename__ = "Pedido"
-    numPedido = Column(Integer, primary_key=True, nullable=False)
-    fechaPedido = Column(Date, nullable=False, default=func.current_date())
-    hora = Column(Date, nullable=False, default=func.current_hour())
-    cantidad = Column(Integer, nullable=False)
-    estado = Column(String, nullable=False)
-    total = Column(float,  nullable=False)
-    RFC_Empleado = Column(Integer, ForeignKey("Empleado.RFC", ondelete="CASCADE"), nullable=False)
-    numCliente = Column(Integer, ForeignKey("Cliente.numCliente", ondelete="CASCADE"), nullable=False)
+    __tablename__ = "PEDIDO"
+    NumPedido = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    FechaPedido = Column(Date, nullable=False, default=func.current_date())
+    Hora = Column(Time, nullable=False, default=func.current_time())
+    Cantidad = Column(Integer, nullable=False)
+    Estado = Column(String, nullable=False)
+    Total = Column(Float,  nullable=False)
+    RFC_Empleado = Column(String, ForeignKey("EMPLEADO.RFC", ondelete="CASCADE"), nullable=False)
+    NumCliente = Column(Integer, ForeignKey("CLIENTE.NumCliente", ondelete="CASCADE"), nullable=False)
 
 class Producto(Base):
-    __tablename__ = "Producto"
-    numProducto = Column(Integer, primary_key=True, nullable=False)
-    nombre = Column(String, nullable=False)
-    precio = Column(Float, nullable=False)
-    deescripcion = Column(String)
+    __tablename__ = "PRODUCTO"
+    NumProducto = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    Nombre = Column(String, nullable=False)
+    Precio = Column(Float, nullable=False)
+    Descripcion = Column(String)
 
+class Inventario(Base):
+    __tablename__ = "INVENTARIO"
+    NumIngrediente = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    Nombre = Column(String, nullable=False)
+    CantDisponible = Column(Integer, nullable=False)
+    Precio = Column(Float, nullable=False)
+
+class Utiliza(Base):
+    __tablename__ = "UTILIZA"
+    NumIngrediente = Column(Integer, ForeignKey("INVENTARIO.NumIngrediente", ondelete="CASCADE"), nullable=False, primary_key=True)
+    NumProducto = Column(Integer, ForeignKey("PRODUCTO.NumProducto", ondelete="CASCADE"), nullable=False, primary_key=True)
+
+class Contiene(Base):
+    __tablename__ = "CONTIENE"
+    NumProducto = Column(Integer, ForeignKey("PRODUCTO.NumProducto" ,ondelete="CASCADE"), nullable=False, primary_key=True)
+    NumPedido = Column(Integer, ForeignKey("PEDIDO.NumPedido", ondelete="CASCADE"), nullable=False, primary_key=True)
