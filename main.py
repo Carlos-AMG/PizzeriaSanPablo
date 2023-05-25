@@ -4,6 +4,7 @@ from faker import Faker
 import models
 from database import Base
 import random
+import sys
 
 # Create the engine with echo=True to print SQL statements
 engine = create_engine('postgresql://postgres:admin@localhost:5432/pizzaSanPablo', echo=True)
@@ -22,10 +23,10 @@ fake = Faker('es_MX')
 personas = []
 for _ in range(10):
     persona = models.Persona(
-        Nombre1=fake.first_name(),
-        Nombre2=fake.first_name(),
+        Nombre=fake.first_name(),
         ApellidoP=fake.last_name(),
-        ApellidoM=fake.last_name()
+        ApellidoM=fake.last_name(),
+        Direccion=fake.street_address()
     )
     personas.append(persona)
 
@@ -33,20 +34,20 @@ session.add_all(personas)
 session.commit()
 
 # Add values to the DIRECCION table
-direcciones = []
-guadalajara_zip_codes = ['44100', '44110', '44120', '44130', '44140', '44150', '44160', '44170', '44180', '44190']
-for _ in range(10):
-    choice = random.choice(guadalajara_zip_codes)
-    guadalajara_zip_codes.remove(choice)
-    direccion = models.Direccion(
-        Calle=fake.street_address(),
-        CodigoPostal=choice,
-        InfoAdicional=fake.random_element(["Apartment", "House", "Office"]),
-    )
-    direcciones.append(direccion)
+# direcciones = []
+# guadalajara_zip_codes = ['44100', '44110', '44120', '44130', '44140', '44150', '44160', '44170', '44180', '44190']
+# for _ in range(10):
+#     choice = random.choice(guadalajara_zip_codes)
+#     guadalajara_zip_codes.remove(choice)
+#     direccion = models.Direccion(
+#         Calle=fake.street_address(),
+#         CodigoPostal=choice,
+#         InfoAdicional=fake.random_element(["Apartment", "House", "Office"]),
+#     )
+#     direcciones.append(direccion)
 
-session.add_all(direcciones)
-session.commit()
+# session.add_all(direcciones)
+# session.commit()
 
 # Add values to the PRODUCTO table
 productos = []
@@ -164,7 +165,6 @@ for x in range(1, 9):
     cliente = models.Cliente(
         Telefono=fake.phone_number(),
         PersonaID=x,
-        DireccionID=x
     )
     clientes.append(cliente)
 
